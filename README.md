@@ -1,71 +1,72 @@
-# HR-Ai — Interview Studio
+# HR-Ai — генератор сценариев собеседований
 
-React + TypeScript interface and Java 21 / Spring Boot API for generating interview questions from a job description through Yandex AI Studio Agent.
+Веб-приложение на React + TypeScript и API на Java 21 / Spring Boot для создания вопросов к собеседованию на основе описания вакансии с помощью агента Yandex AI Studio.
 
-## Features
+## Возможности
 
-- Generates Russian-language interview plans grouped by competencies, with guidance for strong answers.
-- Vacancy context: role, seniority, description, and interview focus.
-- Markdown output with copy and download actions.
-- Example job descriptions, loading/error states, and responsive layout.
-- Layered backend: Controller → Service → AiGateway → LlmClient → YandexAgentClient.
-- Validation, HTTP timeouts, retry, circuit breaker, Actuator metrics, Prometheus, OpenAPI, and unit tests.
+- Создание плана интервью на русском языке с группировкой вопросов по компетенциям и подсказками для оценки сильных ответов.
+- Настройка контекста вакансии: должность, уровень специалиста, описание и фокус интервью.
+- Просмотр результата в формате Markdown, копирование и скачивание.
+- Примеры описаний вакансий, состояния загрузки и ошибки, адаптивный интерфейс.
+- Слоистая архитектура backend: Controller → Service → AiGateway → LlmClient → YandexAgentClient.
+- Валидация, тайм-ауты HTTP-запросов, повторные попытки, автоматический выключатель, метрики Actuator, Prometheus, OpenAPI и модульные тесты.
 
-## Configuration and secrets
+## Настройка и секреты
 
-Required: Java 21, Maven, Node.js 20+ and npm. Docker Engine/Desktop can run the full app.
+Необходимы Java 21, Maven, Node.js 20+ и npm. Для запуска всего приложения можно использовать Docker Engine/Desktop.
 
-Copy .env.example to a local .env and set YANDEX_API_KEY. Never commit the real key. You may override YANDEX_PROJECT_ID and YANDEX_AGENT_ID. Defaults match the supplied project and agent configuration.
+Скопируйте файл `.env.example` в локальный файл `.env` и задайте `YANDEX_API_KEY`. Не добавляйте настоящий ключ в Git. При необходимости можно переопределить `YANDEX_PROJECT_ID` и `YANDEX_AGENT_ID`. Значения по умолчанию соответствуют предоставленной конфигурации проекта и агента.
 
-- YANDEX_API_KEY — secret Yandex AI Studio API key.
-- YANDEX_PROJECT_ID — value sent in the OpenAI-Project header.
-- YANDEX_AGENT_ID — prompt/agent ID used by the Responses API.
-- SERVER_PORT — backend port, default 8080.
-- VITE_API_BASE_URL — optional only if configuring a separate frontend origin; do not put secrets in VITE_ variables.
+- `YANDEX_API_KEY` — секретный API-ключ Yandex AI Studio.
+- `YANDEX_PROJECT_ID` — значение, передаваемое в заголовке `OpenAI-Project`.
+- `YANDEX_AGENT_ID` — идентификатор промпта/агента для Responses API.
+- `SERVER_PORT` — порт backend, по умолчанию 8080.
+- `VITE_API_BASE_URL` — необязательная настройка для отдельного адреса frontend; не храните секреты в переменных с префиксом `VITE_`.
 
-## Run locally
+## Локальный запуск
 
-Set YANDEX_API_KEY in your environment, then run the backend from the repository root:
+Укажите `YANDEX_API_KEY` в переменных окружения и запустите backend из корня репозитория:
 
     mvn spring-boot:run
 
-In another terminal:
+В другом терминале запустите frontend:
 
     cd frontend
     npm install
     npm run dev
 
-Open http://localhost:5173. Vite proxies /api requests to http://localhost:8080. Swagger UI is at http://localhost:8080/swagger-ui.html.
+Откройте http://localhost:5173. Vite перенаправляет запросы к `/api` на http://localhost:8080. Swagger UI доступен по адресу http://localhost:8080/swagger-ui.html.
 
-## Docker
+## Запуск в Docker
 
-Set YANDEX_API_KEY in your shell and run:
+Задайте `YANDEX_API_KEY` в переменных окружения и выполните:
 
     docker compose up --build
 
-Open http://localhost:8080. Compose requires YANDEX_API_KEY to be set.
+Откройте http://localhost:8080. Для запуска Compose необходимо задать `YANDEX_API_KEY`.
 
 ## API
 
-POST /api/interviews/generate
+`POST /api/interviews/generate`
 
-Request JSON fields:
-- vacancyDescription (required, max 12,000 characters)
-- position (optional, max 120 characters)
-- seniority (optional, max 80 characters)
-- questionFocus (optional, max 80 characters)
+Поля JSON-запроса:
 
-The response includes questions, provider, and requestId.
+- `vacancyDescription` — описание вакансии (обязательно, не более 12 000 символов).
+- `position` — название должности (необязательно, не более 120 символов).
+- `seniority` — уровень специалиста (необязательно, не более 80 символов).
+- `questionFocus` — фокус интервью (необязательно, не более 80 символов).
 
-- Swagger UI: /swagger-ui.html
-- OpenAPI JSON: /v3/api-docs
-- Health: /actuator/health
-- Metrics: /actuator/metrics
-- Prometheus: /actuator/prometheus
+Ответ содержит поля `questions`, `provider` и `requestId`.
 
-## Checks
+- Swagger UI: `/swagger-ui.html`
+- JSON OpenAPI: `/v3/api-docs`
+- Состояние приложения: `/actuator/health`
+- Метрики: `/actuator/metrics`
+- Prometheus: `/actuator/prometheus`
+
+## Проверки
 
     mvn test
     cd frontend && npm run build
 
-A real-agent smoke test requires a valid API key and access to the configured Yandex project/agent. Do not claim that integration is verified without running that check.
+Для проверки реального обращения к агенту необходим действующий API-ключ и доступ к настроенному проекту/агенту Yandex. Не считайте интеграцию проверенной, пока такой тест не выполнен.
