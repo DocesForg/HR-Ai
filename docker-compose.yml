@@ -1,0 +1,11 @@
+services:
+  hr-ai:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      SERVER_PORT: "8080"
+      YANDEX_API_KEY: ${YANDEX_API_KEY:?Set YANDEX_API_KEY in your environment}
+      YANDEX_PROJECT_ID: ${YANDEX_PROJECT_ID:-b1gfj3v8keh3qobuh6rv}
+      YANDEX_AGENT_ID: ${YANDEX_AGENT_ID:-fvt526o3mhjmd9f6l2te}
+    restart: unless-stopped
