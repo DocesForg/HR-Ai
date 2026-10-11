@@ -1,16 +1,19 @@
-# ADR 0001: Yandex AI Studio Agent through an LLM Gateway
+# ADR 0001: Использование агента Yandex AI Studio через шлюз LLM
 
-- Status: Accepted
-- Date: 2026-10-11
+- Статус: Принято
+- Дата: 2026-10-11
 
-## Context
-The application generates interview questions from job descriptions. It must use Yandex AI Studio Agent while keeping business logic independent from the LLM vendor.
+## Контекст
 
-## Decision
-The Spring Boot backend calls the Responses API through YandexAgentClient, which implements LlmClient. AiGateway is the abstraction consumed by InterviewService; InterviewService owns prompt construction and product rules. Credentials are supplied through environment variables. React calls the backend and never calls Yandex directly.
+Приложение создаёт вопросы для собеседования на основе описаний вакансий. Оно должно использовать агента Yandex AI Studio, сохраняя независимость бизнес-логики от конкретного поставщика языковой модели.
 
-## Consequences
-- API credentials are not shipped to the browser.
-- Another provider can be added as a separate LlmClient implementation.
-- Network calls are centralized for timeout, retry, circuit breaker, and metrics support.
-- A valid API key and access to the configured agent are required for a live smoke test.
+## Решение
+
+Backend на Spring Boot обращается к Responses API через `YandexAgentClient`, реализующий интерфейс `LlmClient`. `AiGateway` предоставляет абстракцию, которую использует `InterviewService`; сервис отвечает за формирование промпта и правила продукта. Учётные данные передаются через переменные окружения. React обращается к backend и не вызывает Yandex напрямую.
+
+## Последствия
+
+- API-ключи не передаются в браузер.
+- Другого провайдера можно добавить отдельной реализацией `LlmClient`.
+- Сетевые вызовы централизованы, поэтому в одном месте можно настраивать тайм-ауты, повторные попытки, автоматический выключатель и сбор метрик.
+- Для проверки реального обращения к агенту нужны действующий API-ключ и доступ к настроенному агенту.
