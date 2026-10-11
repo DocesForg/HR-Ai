@@ -1,29 +1,34 @@
-# README-AI.md — HR-Ai engineering rules
+# README-AI.md — правила разработки HR-Ai
 
-## Product
-HR-Ai generates a structured interview plan from a job description. Use Russian by default. Keep questions job-related, practical, and non-discriminatory.
+## Продукт
 
-## Architecture constraints
-- Preserve Controller → Service → AiGateway → LlmClient → provider client layering.
-- Controllers handle HTTP and DTOs only. Prompt construction and business rules belong in the service layer.
-- Keep DTOs separate from persistence/domain entities.
-- Do not couple business logic directly to Yandex API; a new provider should implement LlmClient.
-- Never commit API keys or secrets, and never put them in application.yml, documentation, or frontend assets.
-- Do not log vacancy text, model output, PII, API tokens, or authorization headers.
+HR-Ai создаёт структурированный сценарий собеседования на основе описания вакансии. По умолчанию используйте русский язык. Вопросы должны относиться к работе, быть практичными и не содержать дискриминационных формулировок.
 
-## Reliability
-- All external HTTP calls need connect/read timeouts.
-- Use bounded retries for transient errors and circuit breakers to avoid cascading failures.
-- Never expose stack traces or secrets to API clients.
-- Preserve required-field and maximum-length validation.
+## Архитектурные ограничения
 
-## Tests and docs
-- Add JUnit/Mockito unit tests for service logic and integration tests when API contracts change.
-- Update OpenAPI and README when contracts change.
-- Prefer small, focused changes and minimal dependency additions.
-- Verify mvn test and frontend npm run build before claiming the build passes.
+- Сохраняйте слоистую структуру Controller → Service → AiGateway → LlmClient → клиент конкретного провайдера.
+- Контроллеры отвечают только за HTTP и DTO. Формирование промпта и бизнес-правила относятся к сервисному слою.
+- Не смешивайте DTO с доменными сущностями и сущностями хранения данных.
+- Не связывайте бизнес-логику напрямую с API Yandex: новый провайдер должен реализовывать интерфейс `LlmClient`.
+- Никогда не добавляйте API-ключи и другие секреты в репозиторий, `application.yml`, документацию или frontend-ресурсы.
+- Не записывайте в логи текст вакансии, ответы модели, персональные данные, API-токены и заголовки авторизации.
 
-## UI
-- Split growing React functionality into separate components.
-- Keep accessible labels, visible focus states, loading/error states, and responsive layouts.
-- Never put real credentials in VITE_ variables; they are exposed to the browser.
+## Надёжность
+
+- Для всех внешних HTTP-вызовов задавайте тайм-ауты подключения и чтения.
+- Используйте ограниченное число повторных попыток для временных ошибок и автоматические выключатели, предотвращающие каскадные сбои.
+- Не раскрывайте клиентам API трассировки стека и секреты.
+- Сохраняйте проверку обязательных полей и ограничений длины.
+
+## Тесты и документация
+
+- Добавляйте модульные тесты сервисной логики на JUnit/Mockito и интеграционные тесты при изменении API-контрактов.
+- При изменении контрактов обновляйте OpenAPI и README.
+- Предпочитайте небольшие целевые изменения и минимальное добавление зависимостей.
+- Перед тем как утверждать, что сборка успешна, выполните `mvn test` и `npm run build` во frontend.
+
+## Интерфейс
+
+- При росте функциональности React выносите её в отдельные компоненты.
+- Сохраняйте доступные подписи элементов, заметные индикаторы фокуса, состояния загрузки и ошибок, а также адаптивную вёрстку.
+- Не помещайте реальные учётные данные в переменные `VITE_`: они доступны в браузере.
